@@ -7,30 +7,31 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoListViewController: UITableViewController {
     
-    var itemArray = [Item]()
+    /** CRUD - CREATE, READ, UPDATE, DESTROY */
     
+    var itemArray = [Item]()
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     // adding our own custom Item plist
-    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+//    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let newItem = Item()
-        newItem.title = "Drink Milk"
-        itemArray.append(newItem)
-        let newItem2 = Item()
-        newItem.title = "Drink Water"
-        itemArray.append(newItem2)
-        let newItem3 = Item()
-        newItem.title = "Drink Coke"
-        itemArray.append(newItem3)
+        // where the data is being stored
+        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        
+//        let newItem = Item()
+//        newItem.title = "Drink Milk"
         
 //        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
 //            itemArray = items
 //        }
+        
+        loadItems()
     }
     
     // MARK: - Tableview Datasource Methods
@@ -50,6 +51,8 @@ class ToDoListViewController: UITableViewController {
     // MARK: - Tableview Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        context.delete(itemArray[indexPath.row])
+//        itemArray.remove(at: indexPath.row)
         itemArray[indexPath.row].done.toggle()
         saveItems()
         tableView.deselectRow(at: indexPath, animated: true) // turns grey momentarily on touch
@@ -68,8 +71,9 @@ class ToDoListViewController: UITableViewController {
         }
         // when user clicks on add item button
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            let newItem = Item()
+            let newItem = Item(context: self.context)
             newItem.title = textField.text!
+            newItem.done = false
             self.itemArray.append(newItem)
             self.saveItems()
         }
@@ -80,14 +84,39 @@ class ToDoListViewController: UITableViewController {
     // MARK: - Model Manipulation Methods
     
     func saveItems() {
-        let encoder = PropertyListEncoder()
-        do {
-            let data = try encoder.encode(itemArray)
-            try data.write(to: dataFilePath!)
-        } catch {
-            print("error encoding item array \(error)")
-        }
+        do { try context.save() }
+        catch { print("error saving items \(error)") }
         self.tableView.reloadData()
+    }
+    
+    // '=' allows for default value. 'with' is the external parameter for more readability
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+//        if let data = try? Data(contentsOf: dataFilePath!) {
+//            let decoder = PropertyListDecoder()
+//            do { itemArray = try decoder.decode([Item].self, from: data) }
+//             catch { print(error) }
+//        }
+        do { itemArray = try context.fetch(request) }
+        catch { print("error fetching data from context \(error)") }
+        tableView.reloadData()
+    }
+    
+}
+
+    // MARK: - Search bar methods
+
+extension ToDoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request: NSFetchRequest<Item> = Item.fetchRequest()
+        // [cd] - case and diacritic insensitive
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        loadItems(with: request)
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {loadItems();DispatchQueue.main.async{searchBar.resignFirstResponder()};}
     }
     
 }
