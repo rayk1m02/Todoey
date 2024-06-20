@@ -14,6 +14,8 @@ class ToDoListViewController: UITableViewController {
     /** CRUD - CREATE, READ, UPDATE, DESTROY */
     
     var itemArray = [Item]()
+    var selectedCategory: Category? { didSet { loadItems() } }
+    
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     // adding our own custom Item plist
 //    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
@@ -30,8 +32,6 @@ class ToDoListViewController: UITableViewController {
 //        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
 //            itemArray = items
 //        }
-        
-        loadItems()
     }
     
     // MARK: - Tableview Datasource Methods
@@ -61,19 +61,18 @@ class ToDoListViewController: UITableViewController {
     // MARK: - Add New Items
     
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
-        
         var textField = UITextField()
-        
         let alert = UIAlertController(title: "Add New Todoey Item", message: "", preferredStyle: .alert)
         alert.addTextField { alertTextField in
             alertTextField.placeholder = "Create new item"
-            textField = alertTextField
+            textField = alertTextField // to use in action call, need to hold the text value
         }
         // when user clicks on add item button
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             self.saveItems()
         }
@@ -90,7 +89,14 @@ class ToDoListViewController: UITableViewController {
     }
     
     // '=' allows for default value. 'with' is the external parameter for more readability
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()) {
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil) {
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        if let additionalPredicate = predicate {
+            // filter items that match both predicates
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, additionalPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
 //        if let data = try? Data(contentsOf: dataFilePath!) {
 //            let decoder = PropertyListDecoder()
 //            do { itemArray = try decoder.decode([Item].self, from: data) }
@@ -110,13 +116,16 @@ extension ToDoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         let request: NSFetchRequest<Item> = Item.fetchRequest()
         // [cd] - case and diacritic insensitive
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {loadItems();DispatchQueue.main.async{searchBar.resignFirstResponder()};}
+        if searchBar.text?.count == 0 {
+            loadItems()
+            DispatchQueue.main.async{ searchBar.resignFirstResponder() }
+        }
     }
     
 }
