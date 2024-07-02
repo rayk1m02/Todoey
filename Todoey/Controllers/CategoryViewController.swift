@@ -59,7 +59,7 @@ class CategoryViewController: UITableViewController {
 //        do { categories = try context.fetch(request) }
 //        catch { print("Error loading categories \(error)") }
 //        tableView.reloadData()
-        let categories = realm.objects(Category.self)
+        categories = realm.objects(Category.self)
         tableView.reloadData()
     }
     

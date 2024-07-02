@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import CoreData
+//import CoreData
 import RealmSwift
 
 @UIApplicationMain
@@ -20,15 +20,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // shows the path to the pList.
 //        print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
 //        print(Realm?.Configuration.defaultConfiguration.fileURL) // location of Realm file
-        
-        do {
-            let realm = try Realm()
-        }
+        do { _ = try Realm() }
         catch { print("Error initializing realm \(error)") }
-
         return true
     }
 
+    /*
     // app will terminate (user or system triggered)
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
@@ -77,7 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
     }
-
+    */
 
 }
 
