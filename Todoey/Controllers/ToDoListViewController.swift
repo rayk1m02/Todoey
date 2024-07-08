@@ -19,9 +19,7 @@ class ToDoListViewController: UITableViewController {
 //    var itemArray = [Item]()
     var toDoItems: Results<Item>?
     var selectedCategory: Category? {
-        didSet {
-            loadItems()
-        }
+        didSet { loadItems() }
     }
     
 //    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
@@ -30,7 +28,6 @@ class ToDoListViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         // where the data is being stored
         print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
         
@@ -152,6 +149,7 @@ extension ToDoListViewController: UISearchBarDelegate {
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        // clearing the search text resets the view
         if searchBar.text?.count == 0 {
             loadItems()
             DispatchQueue.main.async{ searchBar.resignFirstResponder() }
