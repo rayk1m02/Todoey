@@ -10,7 +10,7 @@ import UIKit
 //import CoreData
 import RealmSwift
 
-class ToDoListViewController: UITableViewController {
+class ToDoListViewController: SwipeTableViewController {
     
     /** CRUD - CREATE, READ, UPDATE, DESTROY */
     
