@@ -13,7 +13,7 @@ import ChameleonFramework
 
 class ToDoListViewController: SwipeTableViewController {
     
-    /** CRUD - CREATE, READ, UPDATE, DESTROY */
+    // CoreData: CRUD - CREATE, READ, UPDATE, DESTROY
     
     let realm = try! Realm()
     
@@ -23,14 +23,23 @@ class ToDoListViewController: SwipeTableViewController {
         didSet { loadItems() }
     }
     
+    @IBOutlet weak var searchBar: UISearchBar!
+    
 //    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     // adding our own custom Item plist
 //    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
     
+    // UI: NavigationBar color, Font colors, etc.
     override func viewWillAppear(_ animated: Bool) {
         if let colorHex = selectedCategory?.color {
+            title = selectedCategory!.name
             guard let navBar = navigationController?.navigationBar else { fatalError("DNE") }
-            navBar.barTintColor = UIColor(hexString: colorHex)
+            if let navBarColor = UIColor(hexString: colorHex) {
+                navBar.barTintColor = navBarColor
+                navBar.tintColor = ContrastColorOf(navBarColor, returnFlat: true)
+                navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true)]
+                searchBar.barTintColor = navBarColor
+            }
         }
     }
 

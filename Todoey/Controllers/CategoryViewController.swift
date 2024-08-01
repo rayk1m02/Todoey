@@ -18,6 +18,11 @@ class CategoryViewController: SwipeTableViewController {
     var categories: Results<Category>?
 //    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
+    override func viewWillAppear(_ animated: Bool) {
+        guard let navBar = navigationController?.navigationBar else { fatalError("DNE") }
+        navBar.backgroundColor = UIColor(hexString: "1D9BF6")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         loadCategories()
@@ -33,8 +38,12 @@ class CategoryViewController: SwipeTableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // tap into the super class (SwipeTableViewController) and at the indexPath
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories Added Yet"
-        cell.backgroundColor = UIColor(hexString: categories?[indexPath.row].color ?? "1D9BF6")
+        if let category = categories?[indexPath.row] {
+            cell.textLabel?.text = category.name
+            guard let categoryColor = UIColor(hexString: category.color) else { fatalError() }
+            cell.backgroundColor = categoryColor
+            cell.textLabel?.textColor = ContrastColorOf(categoryColor, returnFlat: true)
+        }
         return cell
     }
     
