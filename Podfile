@@ -6,6 +6,7 @@ target 'Todoey' do
 #  pod 'RealmSwift', '10.52.1'
   pod 'RealmSwift'
   pod 'SwipeCellKit'
+  pod 'ChameleonFramework/Swift', :git => 'https://github.com/wowansm/Chameleon.git', :branch => 'swift5'
 end
 
 post_install do |installer|
