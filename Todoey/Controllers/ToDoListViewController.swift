@@ -64,7 +64,7 @@ class ToDoListViewController: SwipeTableViewController {
             // gradient effect - continues gradient theme from category VC to item VC
             if let color = UIColor(hexString: selectedCategory!.color)?.darken(byPercentage: (CGFloat(indexPath.row) / CGFloat(toDoItems!.count))) {
                 cell.backgroundColor = color
-                // font color based on gradient (darker gradient -> white font)
+                // font color based on gradient (darker gradient -> whiter font)
                 cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
             }
         } else {
@@ -140,7 +140,7 @@ class ToDoListViewController: SwipeTableViewController {
     }
      */
     
-    // new method using Real - makes things more simplified
+    // new method using Realm - makes things more simplified
     func loadItems() {
         toDoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         tableView.reloadData()
@@ -162,7 +162,7 @@ extension ToDoListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         /** Using Core Data */
 //        let request: NSFetchRequest<Item> = Item.fetchRequest()
-//        // [cd] - case and diacritic insensitive
+//        // [cd] - case and diacritic insensitive (diacritic - small mark added to letters to alter pronounciation)
 //        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
 //        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
 //        loadItems(with: request, predicate: predicate)

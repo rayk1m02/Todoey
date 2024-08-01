@@ -101,6 +101,7 @@ class CategoryViewController: SwipeTableViewController {
             alertTextField.placeholder = "Add a new category"
             textField = alertTextField
         }
+        // need var textField to hold the alert textfield so that it can be referenced from action closure
         let action = UIAlertAction(title: "Add", style: .default) { action in
             let newCategory = Category()
             newCategory.name = textField.text!

@@ -3,7 +3,6 @@ platform :ios, '12.0'
 target 'Todoey' do
   use_frameworks!
   # Pods for Todoey
-#  pod 'RealmSwift', '10.52.1'
   pod 'RealmSwift'
   pod 'SwipeCellKit'
   pod 'ChameleonFramework/Swift', :git => 'https://github.com/wowansm/Chameleon.git', :branch => 'swift5'
