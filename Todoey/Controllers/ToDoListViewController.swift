@@ -9,6 +9,7 @@
 import UIKit
 //import CoreData
 import RealmSwift
+import ChameleonFramework
 
 class ToDoListViewController: SwipeTableViewController {
     
@@ -25,18 +26,19 @@ class ToDoListViewController: SwipeTableViewController {
 //    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     // adding our own custom Item plist
 //    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Items.plist")
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if let colorHex = selectedCategory?.color {
+            guard let navBar = navigationController?.navigationBar else { fatalError("DNE") }
+            navBar.barTintColor = UIColor(hexString: colorHex)
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         // where the data is being stored
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
-        
-//        let newItem = Item()
-//        newItem.title = "Drink Milk"
-        
-//        if let items = defaults.array(forKey: "ToDoListArray") as? [Item] {
-//            toDoItems = items
-//        }
+//        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        tableView.separatorStyle = .none
     }
     
     // MARK: - Tableview Datasource Methods
@@ -50,6 +52,12 @@ class ToDoListViewController: SwipeTableViewController {
         if let item = toDoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
             cell.accessoryType = item.done ? .checkmark : .none
+            // gradient effect - continues gradient theme from category VC to item VC
+            if let color = UIColor(hexString: selectedCategory!.color)?.darken(byPercentage: (CGFloat(indexPath.row) / CGFloat(toDoItems!.count))) {
+                cell.backgroundColor = color
+                // font color based on gradient (darker gradient -> white font)
+                cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+            }
         } else {
             cell.textLabel?.text = "No Items Added"
         }
